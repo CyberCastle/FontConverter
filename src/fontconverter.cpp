@@ -18,31 +18,26 @@ See notes at end for glyph nomenclature & other tidbits.
 */
 
 #include <cctype>
-#include <iostream>
 #include <ft2build.h>
+#include <iostream>
 #include FT_MODULE_H
 #include FT_GLYPH_H
 #include FT_TRUETYPE_DRIVER_H
 #include "../include/gfxfont.h" // Adafruit_GFX font structures
-#include "utils.h"
 #include "fontconverter.h"
+#include "utils.h"
 
 #define DPI 141 // Approximate res. of Adafruit 2.8" TFT
 
-void FontConverter::fillFontInfo(std::string fontName, int fontSize, int bits, std::string fontStyle)
-{
+void FontConverter::fillFontInfo(std::string fontName, int fontSize, int bits, std::string fontStyle) {
     // Space and punctuation chars in name replaced w/ underscores, for C++ output.
     char c;
-    if (this->outType == 0)
-    {
-        for (int i = 0; (c = fontName[i]); i++)
-        {
+    if (this->outType == 0) {
+        for (int i = 0; (c = fontName[i]); i++) {
             if (isspace(c) || ispunct(c))
                 fontName[i] = '_';
         }
-    }
-    else
-    {
+    } else {
         // Add font style to JSON output
         utils::replaceAll(this->templateToFill, "$fontStyle$", fontStyle);
     }
@@ -52,54 +47,42 @@ void FontConverter::fillFontInfo(std::string fontName, int fontSize, int bits, s
     utils::replaceAll(this->templateToFill, "$bits$", utils::intToStr(bits));
 }
 
-void FontConverter::fillBitmapInfo()
-{
+void FontConverter::fillBitmapInfo() {
     utils::replaceAll(this->templateToFill, "$bitmapData$", this->bitmapBuilder.str());
     this->bitmapBuilder.str(std::string());
 }
 
-void FontConverter::fillGlyphInfo()
-{
+void FontConverter::fillGlyphInfo() {
     utils::replaceAll(this->templateToFill, "$glyphData$", this->bitmapBuilder.str());
     this->bitmapBuilder.str(std::string());
 }
 
-void FontConverter::fillFontSpec(int firstChar, int lastChar, int yAdvance)
-{
+void FontConverter::fillFontSpec(int firstChar, int lastChar, int yAdvance) {
     utils::replaceAll(this->templateToFill, "$firstChar$", utils::intToHex(firstChar));
     utils::replaceAll(this->templateToFill, "$lastChar$", utils::intToHex(lastChar));
     utils::replaceAll(this->templateToFill, "$yAdvance$", utils::intToStr(yAdvance));
 }
 
 // Accumulate bits for output, with periodic hexadecimal byte write
-void FontConverter::enbit(uint8_t value)
-{
+void FontConverter::enbit(uint8_t value) {
     if (value)
-        sum |= bit; // Set bit if needed
-    if (!(bit >>= 1))
-    { // Advance to next bit, end of byte reached?
-        if (!firstCall)
-        { // Format output table nicely
-            if (++row >= 12)
-            {
+        sum |= bit;       // Set bit if needed
+    if (!(bit >>= 1)) {   // Advance to next bit, end of byte reached?
+        if (!firstCall) { // Format output table nicely
+            if (++row >= 12) {
                 // Last entry on line?
                 this->bitmapBuilder << ",\n  "; // Newline format output
                 row = 0;                        // Reset row counter
-            }
-            else
-            {                                // Not end of line
-                this->bitmapBuilder << ", "; // Simple comma delim
+            } else {                            // Not end of line
+                this->bitmapBuilder << ", ";    // Simple comma delim
             }
         }
 
         // Write byte value
-        if (this->outType == 0)
-        {
+        if (this->outType == 0) {
             // C++ output
             this->bitmapBuilder << utils::intToHex(unsigned(sum));
-        }
-        else
-        {
+        } else {
             // JSON output
             this->bitmapBuilder << std::setw(3) << std::setfill(' ') << utils::intToStr(unsigned(sum));
         }
@@ -110,8 +93,7 @@ void FontConverter::enbit(uint8_t value)
 }
 
 // Method for convert TrueType font to Adafruit_GFX font structures
-int FontConverter::convert(char *fileName, int fontSize, int firstChar, int lastChar)
-{
+int FontConverter::convert(char *fileName, int fontSize, int firstChar, int lastChar) {
     int i, j, err, bitmapOffset = 0, x, y, byte;
     FT_Library library;
     FT_Face face;
@@ -121,8 +103,7 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
     GFXglyph *table;
     uint8_t bit;
 
-    if (lastChar < firstChar)
-    {
+    if (lastChar < firstChar) {
         i = firstChar;
         firstChar = lastChar;
         lastChar = i;
@@ -130,15 +111,13 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
 
     // Allocate space glyph table
     if ((!(table = static_cast<GFXglyph *>(malloc((lastChar - firstChar + 1) *
-                                                  sizeof(GFXglyph))))))
-    {
+                                                  sizeof(GFXglyph)))))) {
         std::cerr << "Malloc error" << std::endl;
         return 1;
     }
 
     // Init FreeType lib, load font
-    if ((err = FT_Init_FreeType(&library)))
-    {
+    if ((err = FT_Init_FreeType(&library))) {
         std::cerr << "FreeType init error: " << err << std::endl;
         return err;
     }
@@ -152,8 +131,7 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
                     "interpreter-version",
                     &interpreter_version);
 
-    if ((err = FT_New_Face(library, fileName, 0, &face)))
-    {
+    if ((err = FT_New_Face(library, fileName, 0, &face))) {
         std::cerr << "Font load error: " << err << std::endl;
         FT_Done_FreeType(library);
         return err;
@@ -170,25 +148,21 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
     // will need to handle encoding stuff to deal with extracting
     // the right symbols, and that's not done yet.
     // Process glyphs and output huge bitmap data array
-    for (i = firstChar, j = 0; i <= lastChar; i++, j++)
-    {
+    for (i = firstChar, j = 0; i <= lastChar; i++, j++) {
         // MONO renderer provides clean image with perfect crop
         // (no wasted pixels) via bitmap struct.
-        if ((err = FT_Load_Char(face, i, FT_LOAD_TARGET_MONO)))
-        {
+        if ((err = FT_Load_Char(face, i, FT_LOAD_TARGET_MONO))) {
             std::cerr << "Error " << err << " loading char '" << static_cast<char>(i) << "'" << std::endl;
             continue;
         }
 
         if ((err = FT_Render_Glyph(face->glyph,
-                                   FT_RENDER_MODE_MONO)))
-        {
+                                   FT_RENDER_MODE_MONO))) {
             std::cerr << "Error " << err << " rendering char '" << static_cast<char>(i) << "'" << std::endl;
             continue;
         }
 
-        if ((err = FT_Get_Glyph(face->glyph, &glyph)))
-        {
+        if ((err = FT_Get_Glyph(face->glyph, &glyph))) {
             std::cerr << "Error " << err << " getting glyph '" << static_cast<char>(i) << "'" << std::endl;
             continue;
         }
@@ -211,10 +185,8 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
         table[j].xOffset = g->left;
         table[j].yOffset = 1 - g->top;
 
-        for (y = 0; y < bitmap->rows; y++)
-        {
-            for (x = 0; x < bitmap->width; x++)
-            {
+        for (y = 0; y < bitmap->rows; y++) {
+            for (x = 0; x < bitmap->width; x++) {
                 byte = x / 8;
                 bit = 0x80 >> (x & 7);
                 enbit(bitmap->buffer[y * bitmap->pitch + byte] & bit);
@@ -223,8 +195,7 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
 
         // Pad end of char bitmap to next byte boundary if needed
         int n = (bitmap->width * bitmap->rows) & 7;
-        if (n)
-        {              // Pixel count not an even multiple of 8?
+        if (n) {       // Pixel count not an even multiple of 8?
             n = 8 - n; // # bits to next multiple
             while (n--)
                 enbit(0);
@@ -238,15 +209,11 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
     this->fillBitmapInfo();
 
     // Output glyph attributes table (one per character)
-    for (i = firstChar, j = 0; i <= lastChar; i++, j++)
-    {
-        if (this->outType == 0)
-        {
+    for (i = firstChar, j = 0; i <= lastChar; i++, j++) {
+        if (this->outType == 0) {
             // Braces for C++ output
             this->bitmapBuilder << "  { ";
-        }
-        else
-        {
+        } else {
             // Square brackets for JSON output
             this->bitmapBuilder << "  [ ";
         }
@@ -258,47 +225,32 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
         this->bitmapBuilder << ", " << std::setw(4) << std::setfill(' ') << static_cast<int>(table[j].yOffset);
 
         // Close braces
-        if (i < lastChar)
-        {
-            if (this->outType == 0)
-            {
+        if (i < lastChar) {
+            if (this->outType == 0) {
                 // Braces for C++ output
                 this->bitmapBuilder << " }, ";
-            }
-            else
-            {
+            } else {
                 // Square brackets for JSON output
                 this->bitmapBuilder << " ], ";
             }
-        }
-        else
-        {
-            if (this->outType == 0)
-            {
+        } else {
+            if (this->outType == 0) {
                 // Braces for C++ output
                 this->bitmapBuilder << " }  ";
-            }
-            else
-            {
+            } else {
                 // Square brackets for JSON output
                 this->bitmapBuilder << " ]  ";
             }
         }
 
         // Print character associated to glyph attributes (only for C++ output)
-        if (this->outType == 0)
-        {
-            if ((i >= ' ') && (i <= '~'))
-            {
+        if (this->outType == 0) {
+            if ((i >= ' ') && (i <= '~')) {
                 this->bitmapBuilder << "  // " << utils::intToHex(i) << " '" << static_cast<char>(i) << "'" << std::endl;
-            }
-            else
-            {
+            } else {
                 this->bitmapBuilder << "  // " << utils::intToHex(i) << std::endl;
             }
-        }
-        else
-        {
+        } else {
             // Omit print character in JSON output
             this->bitmapBuilder << std::endl;
         }
@@ -308,13 +260,10 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
     this->fillGlyphInfo();
 
     // Output font structure
-    if (face->size->metrics.height == 0)
-    {
+    if (face->size->metrics.height == 0) {
         // No face height info, assume fixed width and get from a glyph.
         this->fillFontSpec(firstChar, lastChar, table[0].height);
-    }
-    else
-    {
+    } else {
         this->fillFontSpec(firstChar, lastChar, face->size->metrics.height >> 6);
     }
 
@@ -323,8 +272,7 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
     return 0;
 }
 
-const char *FontConverter::getCode()
-{
+const char *FontConverter::getCode() {
     size_t size = this->templateToFill.size();
     char *result = new char[size + 1];
     this->templateToFill.copy(result, size + 1);

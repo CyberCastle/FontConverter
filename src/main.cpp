@@ -1,15 +1,13 @@
-#include <iostream>
 #include "fontconverter.h"
+#include <iostream>
 
 extern "C"
 {
-    const char *generateFont(char *fileName, int fontSize, int outType)
-    {
+    const char *generateFont(char *fileName, int fontSize, int outType) {
 
         int firstChar = ' ', lastChar = '~';
         FontConverter f(outType);
-        if (f.convert(fileName, fontSize, firstChar, lastChar) != 0)
-        {
+        if (f.convert(fileName, fontSize, firstChar, lastChar) != 0) {
             return "Error";
         }
 
@@ -17,8 +15,7 @@ extern "C"
     }
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 
     int out, fontSize, firstChar = ' ', lastChar = '~';
 
@@ -29,20 +26,16 @@ int main(int argc, char *argv[])
     // Unless overridden, default firstChar and last chars are
     // ' ' (space) and '~', respectively
 
-    if (argc < 3)
-    {
+    if (argc < 3) {
         //fprintf(stderr, "Usage: %s fontfile size [first] [last]\n", argv[0]);
         return 0;
     }
 
     fontSize = atoi(argv[2]);
 
-    if (argc == 4)
-    {
+    if (argc == 4) {
         lastChar = atoi(argv[3]);
-    }
-    else if (argc == 5)
-    {
+    } else if (argc == 5) {
         firstChar = atoi(argv[3]);
         lastChar = atoi(argv[4]);
     }
