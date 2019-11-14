@@ -118,13 +118,13 @@ int FontConverter<stream>::convert(char *fileName, int fontSize, int firstChar, 
     // Allocate space glyph table
     if ((!(table = static_cast<GFXglyph *>(malloc((lastChar - firstChar + 1) *
                                                   sizeof(GFXglyph)))))) {
-        (*stream) << "Malloc error" << std::endl;
+        (*stream) << "Malloc error." << std::endl;
         return 1;
     }
 
     // Init FreeType lib, load font
     if ((err = FT_Init_FreeType(&library))) {
-        (*stream) << "FreeType init error: " << err << std::endl;
+        (*stream) << "Error to initalize FreeType." << std::endl;
         return err;
     }
 
@@ -138,7 +138,7 @@ int FontConverter<stream>::convert(char *fileName, int fontSize, int firstChar, 
                     &interpreter_version);
 
     if ((err = FT_New_Face(library, fileName, 0, &face))) {
-        (*stream) << "Font load error: " << err << std::endl;
+        (*stream) << "Error to load font file. " << std::endl;
         FT_Done_FreeType(library);
         return err;
     }
@@ -158,18 +158,18 @@ int FontConverter<stream>::convert(char *fileName, int fontSize, int firstChar, 
         // MONO renderer provides clean image with perfect crop
         // (no wasted pixels) via bitmap struct.
         if ((err = FT_Load_Char(face, i, FT_LOAD_TARGET_MONO))) {
-            (*stream) << "Error " << err << " loading char '" << static_cast<char>(i) << "'" << std::endl;
+            (*stream) << "Error " << err << " loading char '" << static_cast<char>(i) << "'." << std::endl;
             continue;
         }
 
         if ((err = FT_Render_Glyph(face->glyph,
                                    FT_RENDER_MODE_MONO))) {
-            (*stream) << "Error " << err << " rendering char '" << static_cast<char>(i) << "'" << std::endl;
+            (*stream) << "Error " << err << " rendering char '" << static_cast<char>(i) << "'." << std::endl;
             continue;
         }
 
         if ((err = FT_Get_Glyph(face->glyph, &glyph))) {
-            (*stream) << "Error " << err << " getting glyph '" << static_cast<char>(i) << "'" << std::endl;
+            (*stream) << "Error " << err << " getting glyph '" << static_cast<char>(i) << "'." << std::endl;
             continue;
         }
 
