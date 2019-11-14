@@ -29,7 +29,8 @@ See notes at end for glyph nomenclature & other tidbits.
 
 #define DPI 141 // Approximate res. of Adafruit 2.8" TFT
 
-void FontConverter::fillFontInfo(std::string fontName, int fontSize, int bits, std::string fontStyle) {
+template <std::ostream *stream>
+void FontConverter<stream>::fillFontInfo(std::string fontName, int fontSize, int bits, std::string fontStyle) {
     // Space and punctuation chars in name replaced w/ underscores, for C++ output.
     char c;
     if (this->outType == 0) {
@@ -47,24 +48,28 @@ void FontConverter::fillFontInfo(std::string fontName, int fontSize, int bits, s
     utils::replaceAll(this->templateToFill, "$bits$", utils::intToStr(bits));
 }
 
-void FontConverter::fillBitmapInfo() {
+template <std::ostream *stream>
+void FontConverter<stream>::fillBitmapInfo() {
     utils::replaceAll(this->templateToFill, "$bitmapData$", this->bitmapBuilder.str());
     this->bitmapBuilder.str(std::string());
 }
 
-void FontConverter::fillGlyphInfo() {
+template <std::ostream *stream>
+void FontConverter<stream>::fillGlyphInfo() {
     utils::replaceAll(this->templateToFill, "$glyphData$", this->bitmapBuilder.str());
     this->bitmapBuilder.str(std::string());
 }
 
-void FontConverter::fillFontSpec(int firstChar, int lastChar, int yAdvance) {
+template <std::ostream *stream>
+void FontConverter<stream>::fillFontSpec(int firstChar, int lastChar, int yAdvance) {
     utils::replaceAll(this->templateToFill, "$firstChar$", utils::intToHex(firstChar));
     utils::replaceAll(this->templateToFill, "$lastChar$", utils::intToHex(lastChar));
     utils::replaceAll(this->templateToFill, "$yAdvance$", utils::intToStr(yAdvance));
 }
 
 // Accumulate bits for output, with periodic hexadecimal byte write
-void FontConverter::enbit(uint8_t value) {
+template <std::ostream *stream>
+void FontConverter<stream>::enbit(uint8_t value) {
     if (value)
         sum |= bit;       // Set bit if needed
     if (!(bit >>= 1)) {   // Advance to next bit, end of byte reached?
@@ -93,7 +98,8 @@ void FontConverter::enbit(uint8_t value) {
 }
 
 // Method for convert TrueType font to Adafruit_GFX font structures
-int FontConverter::convert(char *fileName, int fontSize, int firstChar, int lastChar) {
+template <std::ostream *stream>
+int FontConverter<stream>::convert(char *fileName, int fontSize, int firstChar, int lastChar) {
     int i, j, err, bitmapOffset = 0, x, y, byte;
     FT_Library library;
     FT_Face face;
@@ -112,13 +118,13 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
     // Allocate space glyph table
     if ((!(table = static_cast<GFXglyph *>(malloc((lastChar - firstChar + 1) *
                                                   sizeof(GFXglyph)))))) {
-        std::cerr << "Malloc error" << std::endl;
+        (*stream) << "Malloc error" << std::endl;
         return 1;
     }
 
     // Init FreeType lib, load font
     if ((err = FT_Init_FreeType(&library))) {
-        std::cerr << "FreeType init error: " << err << std::endl;
+        (*stream) << "FreeType init error: " << err << std::endl;
         return err;
     }
 
@@ -132,7 +138,7 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
                     &interpreter_version);
 
     if ((err = FT_New_Face(library, fileName, 0, &face))) {
-        std::cerr << "Font load error: " << err << std::endl;
+        (*stream) << "Font load error: " << err << std::endl;
         FT_Done_FreeType(library);
         return err;
     }
@@ -152,18 +158,18 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
         // MONO renderer provides clean image with perfect crop
         // (no wasted pixels) via bitmap struct.
         if ((err = FT_Load_Char(face, i, FT_LOAD_TARGET_MONO))) {
-            std::cerr << "Error " << err << " loading char '" << static_cast<char>(i) << "'" << std::endl;
+            (*stream) << "Error " << err << " loading char '" << static_cast<char>(i) << "'" << std::endl;
             continue;
         }
 
         if ((err = FT_Render_Glyph(face->glyph,
                                    FT_RENDER_MODE_MONO))) {
-            std::cerr << "Error " << err << " rendering char '" << static_cast<char>(i) << "'" << std::endl;
+            (*stream) << "Error " << err << " rendering char '" << static_cast<char>(i) << "'" << std::endl;
             continue;
         }
 
         if ((err = FT_Get_Glyph(face->glyph, &glyph))) {
-            std::cerr << "Error " << err << " getting glyph '" << static_cast<char>(i) << "'" << std::endl;
+            (*stream) << "Error " << err << " getting glyph '" << static_cast<char>(i) << "'" << std::endl;
             continue;
         }
 
@@ -272,7 +278,8 @@ int FontConverter::convert(char *fileName, int fontSize, int firstChar, int last
     return 0;
 }
 
-const char *FontConverter::getCode() {
+template <std::ostream *stream>
+const char *FontConverter<stream>::getCode() {
     size_t size = this->templateToFill.size();
     char *result = new char[size + 1];
     this->templateToFill.copy(result, size + 1);
@@ -280,6 +287,9 @@ const char *FontConverter::getCode() {
     this->templateToFill.clear();
     return result;
 }
+
+template class FontConverter<&std::cout>;
+template class FontConverter<&std::cerr>;
 
 /* -------------------------------------------------------------------------
 

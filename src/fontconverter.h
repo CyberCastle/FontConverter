@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <sstream>
 
+template <std::ostream *stream>
 class FontConverter {
   private:
     // C++ font template
