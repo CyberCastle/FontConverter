@@ -23,10 +23,35 @@ extern "C"
         std::cout.rdbuf(old);
         if (result != 0) {
             std::cerr << buffer.str() << std::endl;
-            return "Error";
+            return "NOK";
         }
 
         return f.getCode();
+    }
+
+    void convertcb(char *fileName, int fontSize, int outType, int firstChar, int lastChar, void (*cb)(const char *, int, const char *)) {
+
+        if (firstChar == NULL) {
+            firstChar = ' ';
+        }
+
+        if (lastChar == NULL) {
+            lastChar = '~';
+        }
+
+        // Idea obtain from here: https://stackoverflow.com/a/5419388/11454077
+        std::stringstream buffer;
+        std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
+
+        FontConverter<&std::cout> f(outType);
+        int result = f.convert(fileName, fontSize, firstChar, lastChar);
+        std::cout.rdbuf(old);
+
+        if (result == 0) {
+            cb(f.getCode(), result, "OK");
+        } else {
+            cb("NOK", result, buffer.str().c_str());
+        }
     }
 }
 
