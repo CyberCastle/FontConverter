@@ -5,14 +5,14 @@
 #####################################
 
 printf "\n\e[36;1mBuild Font Converter...\e[0m\n"
-# Clear build and out folder, to avoid problems
+# Clear build and dist folder, to avoid problems
 if [[ -d build ]]; then
   rm -Rf build/
 fi
 
-# Clear build and out folder, to avoid problems
-if [[ -d out ]]; then
-  rm -Rf out/
+# Clear build and dist folder, to avoid problems
+if [[ -d dist ]]; then
+  rm -Rf dist/
 fi
 
 #Build FontConverter
@@ -20,6 +20,7 @@ cmake -E make_directory build
 cmake -E chdir build emconfigure cmake ..
 emmake make -C build
 
+printf "\n\e[36;1mRunning Tests...\e[0m\n"
 #Test FontConverter
 cd test
 node test.js

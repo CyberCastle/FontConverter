@@ -12,9 +12,9 @@ project (fontconverter C CXX)
 add_definitions(-std=c++17 -Wall -g4)
 include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/vendor/freetype2/include)
 
-file(GLOB SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
+file(GLOB SOURCES ${CMAKE_SOURCE_DIR}/lib/*.cpp)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/out")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/dist")
 add_executable(fontconverter ${SOURCES})
 
 message(STATUS "Setting compilation target to WASM")

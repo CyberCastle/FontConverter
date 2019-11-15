@@ -1,4 +1,4 @@
-const Module = require('../out/fontconverter.js')
+const Module = require('../dist/fontconverter.js')
 const wasm = Module({
     //arguments: ["rRobotoMono-Regular.ttf", "5"],
     noInitialRun: true
