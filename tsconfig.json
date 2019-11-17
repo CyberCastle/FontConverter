@@ -1,0 +1,20 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "declaration": true,
+        "removeComments": true,
+        "lib": ["es2017", "es7", "es6"],
+        "outDir": "dist",
+        "strict": true,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "typeRoots": ["node_modules/@types", "src/types"]
+        //"types": ["emscripten", "node"]
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+}
