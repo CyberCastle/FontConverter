@@ -11,9 +11,10 @@ export interface ConverterResult {
 
 export class FontConverter {
     private emsModule?: EmscriptenModule
-    private _convert!: (...args: any[]) => any
-    private _convertcb!: (...args: any[]) => any
-    private _callbackPtr?: number
+    private _convert!: (...args: any[]) => string
+    private _convertcb!: (...args: any[]) => void
+    private cbConverter!: (result: ConverterResult) => void
+    private cbConverterPointer?: number
     private firstChar?: number
     private lastChar?: number
 
@@ -38,27 +39,36 @@ export class FontConverter {
         return this._convert(fileName, fontSize, this.outType, this.firstChar, this.lastChar)
     }
 
-    private _callbackFunc(result: ConverterResult, cb: (result: ConverterResult) => void): void {
-        cb(result)
+    // Wrapper that allows run the callaback, without it being "memorized" in the wasm pointer table.
+    private cbConverterWrapper(result: ConverterResult): void {
+        if (this.cbConverter === undefined) {
+            return
+        }
+        this.cbConverter(result)
     }
 
-    public convertcb(fileName: string, fontSize: number, cb: (result: ConverterResult) => void): void {
+    public convertcb(fileName: string, fontSize: number, cbConverter: (result: ConverterResult) => void): void {
         if (this.emsModule == undefined) {
             throw 'FontConverter not Initiliazed.'
         }
         if (this._convertcb === undefined) {
             this._convertcb = this.emsModule.cwrap('convertcb', 'void', ['string', 'number', 'number', 'number', 'number', 'pointer'])
 
-            this._callbackPtr = this.emsModule.addFunction((code, errorCode, errorMessage) => {
+            this.cbConverterPointer = this.emsModule.addFunction((code, errorCode, errorMessage) => {
                 const result: ConverterResult = {
                     code: this.emsModule?.AsciiToString(code),
                     errorCode: errorCode,
                     errorMessage: this.emsModule?.AsciiToString(errorMessage)
                 }
-                this._callbackFunc(result, cb)
+
+                // The callback wrapper is executed
+                this.cbConverterWrapper(result)
             }, 'viii')
         }
-        this._convertcb(fileName, fontSize, this.outType, this.firstChar, this.lastChar, this._callbackPtr)
+
+        // The callback is passed to the wrapper through a class variable
+        this.cbConverter = cbConverter
+        this._convertcb(fileName, fontSize, this.outType, this.firstChar, this.lastChar, this.cbConverterPointer)
     }
 
     async initialize(): Promise<void> {
