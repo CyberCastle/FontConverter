@@ -1,6 +1,6 @@
 {
     "name": "fontconverter-wasm",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Adafruit_GFX font converter for NodeJS",
     "directories": {
         "test": "test"
@@ -17,7 +17,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/CyberCastle/Fontconverter.git"
+        "url": "git+https://github.com/CyberCastle/FontConverter-WASM.git"
     },
     "keywords": [
         "adafruit",
@@ -27,9 +27,9 @@
     "author": "CyberCastle",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/CyberCastle/Fontconverter/issues"
+        "url": "https://github.com/CyberCastle/FontConverter-WASM/issues"
     },
-    "homepage": "https://github.com/CyberCastle/Fontconverter#readme",
+    "homepage": "https://github.com/CyberCastle/FontConverter-WASM#readme",
     "devDependencies": {
         "@types/node": "^12.12.8",
         "prettier": "^1.19.1",
