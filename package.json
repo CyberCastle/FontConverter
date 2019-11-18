@@ -1,5 +1,5 @@
 {
-    "name": "fontconverter",
+    "name": "fontconverter-wasm",
     "version": "1.0.0",
     "description": "Adafruit_GFX font converter for NodeJS",
     "directories": {
@@ -10,7 +10,6 @@
     "scripts": {
         "start": "build && test",
         "build": "sh build.sh && tsc",
-        "prepublish": "build",
         "test-library": "node test/test.js",
         "test": "ts-node test/test.ts",
         "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
