@@ -1,44 +1,46 @@
 {
-  "name": "fontconverter",
-  "version": "1.0.0",
-  "description": "Adafruit_GFX font converter for NodeJS",
-  "directories": {
-    "test": "test"
-  },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "start": "tsc && node dist/index.js",
-    "build": "tsc",
-    "--prepublish": "tsc",
-    "test": "node test/test.js",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-    "lint": "tslint -p tsconfig.json"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CyberCastle/Fontconverter.git"
-  },
-  "keywords": [
-    "adafruit",
-    "fontconverter",
-    "freetype2"
-  ],
-  "author": "CyberCastle",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/CyberCastle/Fontconverter/issues"
-  },
-  "homepage": "https://github.com/CyberCastle/Fontconverter#readme",
-  "devDependencies": {
-    "@types/node": "^12.12.8",
-    "prettier": "^1.19.1",
-    "tslint": "^5.20.1",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.7.2"
-  },
-  "files": [
-    "dist/**/*"
-  ],
-  "dependencies": {}
+    "name": "fontconverter",
+    "version": "1.0.0",
+    "description": "Adafruit_GFX font converter for NodeJS",
+    "directories": {
+        "test": "test"
+    },
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "start": "build && test",
+        "build": "sh build.sh && tsc",
+        "prepublish": "build",
+        "test-library": "node test/test.js",
+        "test": "ts-node test/test.ts",
+        "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+        "lint": "tslint -p tsconfig.json"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/CyberCastle/Fontconverter.git"
+    },
+    "keywords": [
+        "adafruit",
+        "fontconverter",
+        "freetype2"
+    ],
+    "author": "CyberCastle",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/CyberCastle/Fontconverter/issues"
+    },
+    "homepage": "https://github.com/CyberCastle/Fontconverter#readme",
+    "devDependencies": {
+        "@types/node": "^12.12.8",
+        "prettier": "^1.19.1",
+        "ts-node": "^8.5.2",
+        "tslint": "^5.20.1",
+        "tslint-config-prettier": "^1.18.0",
+        "typescript": "^3.7.2"
+    },
+    "files": [
+        "dist/**/*"
+    ],
+    "dependencies": {}
 }

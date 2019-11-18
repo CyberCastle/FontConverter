@@ -94,28 +94,3 @@ export class FontConverter {
         })
     }
 }
-
-;(async () => {
-    const converter = new FontConverter(1)
-    await converter.initialize()
-
-    //console.log(converter.convert('./test/monaco.ttf', 5))
-
-    converter.convertcb('./test/monaco.ttf', 5, result => {
-        console.log('-- eee0: ' + result.errorCode)
-    })
-
-    converter.convertcb('./test/4monaco.ttf', 5, result => {
-        console.log('-- eee1: ' + result.errorCode)
-    })
-    converter.convertcb('./test/monaco.ttf', 5, result => {
-        console.log('-- eee2: ' + result.errorCode)
-    })
-    converter.convertcb('./test/monaco.ttf', 5, result => {
-        console.log('-- eee4: ' + result.errorCode)
-    })
-    converter.convertcb('./test/4monaco.ttf', 5, result => {
-        console.log('-- eee5: ' + result.errorCode)
-    })
-    //console.log('pasé!!!')
-})()
