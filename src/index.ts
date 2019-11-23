@@ -71,13 +71,19 @@ export class FontConverter {
         this._convertcb(fileName, fontSize, this.outType, this.firstChar, this.lastChar, this.cbConverterPointer)
     }
 
-    async initialize(): Promise<void> {
+    async initialize(filePath?: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             try {
                 // Try load wasm module.
                 this.emsModule = require('./fontconverter.js')({
-                    //arguments: ['RobotoMono-Regular.ttf', '5'],
                     noInitialRun: true,
+                    wasmBinary: filePath,
+                    locateFile: (path: string, prefix: string) => {
+                        if (filePath === undefined) {
+                            return prefix + path
+                        }
+                        return filePath
+                    },
                     onRuntimeInitialized: () => {
                         // An Emscripten is a then-able that resolves with itself, causing an infite loop when you
                         // wrap it in a real promise. Delete the `then` prop solves this for now.
