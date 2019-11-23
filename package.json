@@ -1,6 +1,6 @@
 {
     "name": "fontconverter-wasm",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "Adafruit_GFX font converter for NodeJS",
     "directories": {
         "test": "test"
