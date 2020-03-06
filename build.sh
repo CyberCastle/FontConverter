@@ -49,8 +49,12 @@ git clone git://git.sv.nongnu.org/freetype/freetype2.git
 popd >/dev/null
 
 printf "\n\e[36;1mApplying patches to FreeType Library...\e[0m\n"
+
+# Delete exports.mk and create it empty
+rm "$(dirname "$0")/vendor/freetype2/builds/exports.mk"
+touch "$(dirname "$0")/vendor/freetype2/builds/exports.mk"
+
 # Apply patches
-patch "$(dirname "$0")/vendor/freetype2/builds/exports.mk" < "$(dirname "$0")/patches/exports.mk.patch"
 patch "$(dirname "$0")/vendor/freetype2/include/freetype/config/ftoption.h" < "$(dirname "$0")/patches/ftoption.h.patch"
 
 # Delete CMakeLists.txt and replace it with a customized
