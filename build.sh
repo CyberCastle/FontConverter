@@ -65,7 +65,7 @@ printf "\n\e[36;1mBuild FreeType Library...\e[0m\n"
 # Build FreeType, how static library
 pushd  "$(dirname "$0")/vendor/freetype2" >/dev/null
 cmake -E make_directory build
-cmake -E chdir build emconfigure cmake ..
+cmake -E chdir build emcmake cmake ..
 emmake make -C build
 popd >/dev/null
 
@@ -82,7 +82,7 @@ fi
 
 #Build FontConverter
 cmake -E make_directory build
-cmake -E chdir build emconfigure cmake ..
+cmake -E chdir build emcmake cmake ..
 emmake make -C build
 
 printf "\n\e[36;1mRunning Tests...\e[0m\n"

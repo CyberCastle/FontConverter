@@ -8,7 +8,7 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "start": "build && test",
+        "start": "npm run build && test",
         "build": "sh build.sh && tsc",
         "test-library": "node test/test.js",
         "test": "ts-node test/test.ts",

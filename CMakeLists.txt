@@ -22,5 +22,5 @@ set(CMAKE_EXECUTABLE_SUFFIX ".js")
 
 # Flags to build with emscripten are described here: 
 # https://github.com/emscripten-core/emscripten/blob/incoming/src/settings.js
-set_target_properties(fontconverter PROPERTIES LINK_FLAGS "-s WASM=1 -s MODULARIZE=1 -s NODERAWFS=1 -s NO_EXIT_RUNTIME=1 -s EXPORTED_FUNCTIONS='[_main, _convert, _convertcb]' -s EXTRA_EXPORTED_RUNTIME_METHODS='[cwrap, addFunction, removeFunction, AsciiToString]' -s STRICT=1 -s INCOMING_MODULE_JS_API='[arguments, noInitialRun, locateFile]' -s ENVIRONMENT=node -s ALLOW_TABLE_GROWTH=1")
+set_target_properties(fontconverter PROPERTIES LINK_FLAGS "-s WASM=2 -s MODULARIZE=1 -s NODERAWFS=1 -s NO_EXIT_RUNTIME=1 -s EXPORTED_FUNCTIONS='[_main, _convert, _convertcb]' -s EXTRA_EXPORTED_RUNTIME_METHODS='[cwrap, addFunction, removeFunction, AsciiToString]' -s STRICT=1 -s INCOMING_MODULE_JS_API='[arguments, noInitialRun, locateFile]' -s ENVIRONMENT=node -s RESERVED_FUNCTION_POINTERS=3")
 target_link_libraries(fontconverter ${CMAKE_SOURCE_DIR}/vendor/freetype2/build/libfreetype.a)

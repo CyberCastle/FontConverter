@@ -17,7 +17,7 @@ fi
 
 #Build FontConverter
 cmake -E make_directory build
-cmake -E chdir build emconfigure cmake ..
+cmake -E chdir build emcmake cmake ..
 emmake make -C build
 
 printf "\n\e[36;1mRunning Tests...\e[0m\n"
